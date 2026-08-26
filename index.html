@@ -57,9 +57,13 @@ SECURITY RECOMMENDATIONS FOR PRODUCTION:
        Social, Achievements, Drafts) to declutter the navbar. Same look as the
        Settings dropdown but for navigation. */
     .nav-more{position:relative}
-    .nav-more-toggle{display:inline-flex;align-items:center;gap:5px}
+    .nav-more-toggle{display:inline-flex;align-items:center;gap:5px;position:relative}
     .nav-more-toggle .caret{font-size:10px;transition:transform .2s;margin-left:2px}
     .nav-more.open .nav-more-toggle .caret{transform:rotate(180deg)}
+    /* [NEW] When a child view of "More" is active, highlight the toggle so
+       the user can see which section the active view belongs to. */
+    .nav-more-toggle.has-active-child{border-color:var(--ac);background:var(--soft)}
+    .nav-more-toggle.has-active-child::after{content:"";position:absolute;bottom:-3px;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;background:var(--ac)}
     .nav-more-dropdown{display:none;position:absolute;top:100%;left:0;margin-top:6px;background:var(--card);border:2px solid var(--border);border-radius:10px;box-shadow:var(--sh2);padding:6px;min-width:170px;z-index:250;flex-direction:column;gap:3px}
     .nav-more.open .nav-more-dropdown{display:flex}
     .nav-more-dropdown .nav-btn{width:100%;text-align:left;display:flex;align-items:center;gap:8px;border-radius:7px;padding:8px 12px}
@@ -137,6 +141,17 @@ SECURITY RECOMMENDATIONS FOR PRODUCTION:
     .library-search{flex:1;min-width:180px;padding:11px 14px;border-radius:8px;border:2px solid var(--border);background:var(--card);color:var(--text);font-size:14px}
     .library-search:focus{outline:none;border-color:var(--ac)}
     .library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+    /* [NEW] List view — single column with horizontal layout (thumb on left,
+       details on right). Activated by adding .list-view to #libraryGrid. */
+    .library-grid.list-view{grid-template-columns:1fr;gap:10px}
+    .library-grid.list-view .library-card{flex-direction:row;align-items:stretch}
+    .library-grid.list-view .library-thumb{width:160px;height:auto;min-height:110px;flex-shrink:0}
+    .library-grid.list-view .library-thumb::after{font-size:13px}
+    .library-grid.list-view .library-card-body{padding:10px 14px;flex:1}
+    .library-grid.list-view .library-card-body .desc{-webkit-line-clamp:3;-webkit-box-orient:vertical;display:-webkit-box;overflow:hidden}
+    /* [NEW] Active state for the view-toggle buttons */
+    .view-toggle-btn.active{background:var(--soft)!important;color:var(--ac)}
+    .view-toggle-btn:hover:not(.active){background:var(--bg)}
     .library-card{background:var(--card);border:2px solid var(--border);border-radius:14px;overflow:hidden;transition:transform .3s,border-color .3s,box-shadow .3s;display:flex;flex-direction:column}
     .library-card:hover{transform:translateY(-4px);border-color:var(--ac);box-shadow:var(--sh2)}
     .library-thumb{height:110px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;color:white;font-size:38px;cursor:pointer;position:relative;font-weight:900}
@@ -1023,6 +1038,8 @@ SECURITY RECOMMENDATIONS FOR PRODUCTION:
       <a class="nav-btn" data-view="achievements" id="navAchievements" role="menuitem"><svg class='svg-icon' width='14' height='14' viewBox='0 0 24 24' fill='none'><use href='#s-star'/></svg> Achievements</a>
       <div class="nav-section-label">Your Stuff</div>
       <a class="nav-btn" data-view="drafts" id="navDrafts" role="menuitem"><svg class='svg-icon' width='14' height='14' viewBox='0 0 24 24' fill='none'><use href='#s-folder'/></svg> Drafts</a>
+      <div class="nav-section-label">Help</div>
+      <a class="nav-btn" id="navShortcutsLink" role="menuitem" tabindex="0"><svg class='svg-icon' width='14' height='14' viewBox='0 0 24 24' fill='none'><use href='#s-keyboard'/></svg> Keyboard Shortcuts</a>
     </div>
   </div>
   <div class="nav-right">
@@ -1032,14 +1049,14 @@ SECURITY RECOMMENDATIONS FOR PRODUCTION:
     </div>
     <button class="notif-btn" id="notifBtn" title="Notifications"><svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"><use href="#s-bell"/></svg><span class="notif-badge" id="notifBadge">0</span></button>
     <button class="notif-btn" id="groupsBtn" title="Groups &amp; DMs" style="position:relative"><svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"><use href="#s-chat"/></svg><span class="notif-badge" id="dmBadge" style="display:none">0</span></button>
-    <button class="nav-btn auth-btn" id="authNavBtn" data-i18n="nav.login">Login</button>
+    <button class="nav-btn auth-btn" id="authNavBtn" data-i18n-skip>Login</button>
     <div class="settings">
       <button class="settings-toggle" id="settingsToggle" data-i18n="nav.settings">Settings</button>
       <div class="settings-dropdown" id="settingsDropdown">
 
-        <button class="settings-btn" id="darkToggle" data-i18n="nav.darkMode">Dark Mode</button>
-        <button class="settings-btn" id="soundToggle" data-i18n="nav.soundOff">Sound OFF</button>
-        <button class="settings-btn" id="tutorialToggle" data-i18n="nav.tutorialOn">Tutorial ON</button>
+        <button class="settings-btn" id="darkToggle" data-i18n-skip>Dark Mode</button>
+        <button class="settings-btn" id="soundToggle" data-i18n-skip>Sound OFF</button>
+        <button class="settings-btn" id="tutorialToggle" data-i18n-skip>Tutorial ON</button>
         <!-- [NEW] Theme accent color picker row — appears inside the Settings dropdown -->
         <div class="settings-theme-row">
           <div style="font-size:11px;font-weight:700;color:var(--text);opacity:.85;margin-bottom:6px" data-i18n="settings.theme">Accent Theme</div>
@@ -1148,6 +1165,17 @@ SECURITY RECOMMENDATIONS FOR PRODUCTION:
 <div class="library-controls" id="gamesControls">
       <input type="text" class="library-search" id="librarySearch" placeholder="Search games or creators...">
       <button class="studio-btn secondary" id="searchUsersBtn">Find Users</button>
+      <!-- [NEW] Grid/List view toggle — persisted in localStorage. List view
+           shows games in a single column with more detail (description,
+           tags, timestamps); grid view is the compact default. -->
+      <div class="view-toggle" role="group" aria-label="Library view mode" style="display:flex;gap:0;border:2px solid var(--border);border-radius:8px;overflow:hidden;margin-left:auto">
+        <button type="button" class="view-toggle-btn active" id="viewToggleGrid" title="Grid view" aria-label="Grid view" aria-pressed="true" style="padding:7px 10px;background:var(--card);border:none;cursor:pointer;font-size:14px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </button>
+        <button type="button" class="view-toggle-btn" id="viewToggleList" title="List view" aria-label="List view" aria-pressed="false" style="padding:7px 10px;background:var(--card);border:none;border-left:1px solid var(--border);cursor:pointer;font-size:14px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3.5" cy="6" r="1.2" fill="currentColor"/><circle cx="3.5" cy="12" r="1.2" fill="currentColor"/><circle cx="3.5" cy="18" r="1.2" fill="currentColor"/></svg>
+        </button>
+      </div>
     </div>
     <div class="library-controls" id="groupsControls" style="display:none">
       <input type="text" class="library-search" id="groupsSearch" placeholder="Search groups...">
@@ -2142,6 +2170,25 @@ SECURITY RECOMMENDATIONS FOR PRODUCTION:
   </div>
 </div>
 
+<!-- [NEW] Description modal — replaces the blocking prompt() that was used
+     when publishing a game. Proper modal with textarea, character counter,
+     and keyboard support (Enter to publish, Esc to cancel). -->
+<div class="modal-overlay" id="descModal">
+  <div class="modal" style="max-width:480px">
+    <h3><svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"><use href="#s-edit"/></svg> Describe your game</h3>
+    <p style="font-size:13px;opacity:.7;margin-bottom:10px">A short description helps players find and understand your game.</p>
+    <textarea id="descInput" placeholder="A new GlimWorld creation!" maxlength="200" style="width:100%;min-height:80px;padding:10px;border-radius:8px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;resize:vertical"></textarea>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+      <span id="descCounter" style="font-size:11px;opacity:.6">0 / 200</span>
+      <span style="font-size:11px;opacity:.5">Enter to publish · Esc to cancel</span>
+    </div>
+    <div class="modal-actions">
+      <button class="studio-btn secondary" id="closeDescBtn">Cancel</button>
+      <button class="studio-btn primary" id="confirmDescBtn">Publish</button>
+    </div>
+  </div>
+</div>
+
 <!-- Player -->
 <div class="modal-overlay" id="playerModal">
   <div class="modal" style="max-width:860px">
@@ -2335,6 +2382,12 @@ const _tablesProbed=new Set();
 // column doesn't exist (42703 error). Declared here so saveUserSettings
 // (defined later) can safely reference it without TDZ issues.
 let _settingsColumnOk=true;
+// [BUGFIX] Games-table column flags — set to false if the column doesn't
+// exist. The `plays` column is missing on older Supabase deployments, and
+// every game-open logged a noisy 400 error even though we expected it.
+// Probed lazily on first failure; subsequent calls skip the network entirely.
+let _gamesPlaysColumnOk=true;
+let _gamesViewsColumnOk=true;
 // [BUGFIX] Wrapped DB helpers — these check the dead-tables set BEFORE
 // hitting the network, so a 401 table doesn't spam the console on every
 // heartbeat/poll cycle. The probe runs once at startup (probeAllTables)
@@ -2368,7 +2421,11 @@ async function dbPatch(t,q,d){
   const r=await fetch(`${SUPABASE_URL}/rest/v1/${t}?${q}`,{method:"PATCH",headers:dbH(),body:JSON.stringify(d)});
   if(!r.ok){
     const e=await r.text();
-    if(r.status!==401&&r.status!==404)console.error("dbPatch",t,r.status,e);
+    // [BUGFIX] Suppress 400 PGRST204 errors — these mean a column is missing
+    // (e.g. `plays` on older deployments). The caller handles this via the
+    // column-OK flags; logging it on every call is just console noise.
+    const isColumnMissing = r.status===400 && (e.includes("PGRST204")||e.includes("Could not find the"));
+    if(r.status!==401&&r.status!==404&&!isColumnMissing)console.error("dbPatch",t,r.status,e);
     if(r.status===401||r.status===404)_deadTables.add(t);
     throw new Error(e);
   }
@@ -2809,6 +2866,15 @@ function switchView(v){
     const el=document.getElementById("view-"+v);
     if(el)el.classList.add("active");
     document.querySelectorAll(".nav-btn[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===v));
+    // [NEW] Sync the "More" toggle's has-active-child indicator — true when
+    // the active view is one of the dropdown's children (explore, leaderboard,
+    // social, achievements, drafts).
+    const navMore=document.getElementById("navMore");
+    const navMoreToggle=document.getElementById("navMoreToggle");
+    if(navMore&&navMoreToggle){
+      const childActive=!!navMore.querySelector('.nav-more-dropdown .nav-btn[data-view="'+v+'"]');
+      navMoreToggle.classList.toggle("has-active-child",childActive);
+    }
     window.scrollTo({top:0,behavior:"smooth"});try{playSound();}catch(e){}
     if(v==="discovery"){try{renderLibrary();}catch(e){}try{renderFeaturedSection();}catch(e){}}
     if(v==="build"){_editingGameId=null;const pb=document.getElementById("publishBtn");if(pb){pb.textContent="Publish";delete pb.dataset.editing;}currentTags=[];try{renderTagPreview();}catch(e){}}
@@ -2902,6 +2968,19 @@ try {
         }catch(err){}
       });
     });
+    // [NEW] Wire the "Keyboard Shortcuts" link inside the More dropdown —
+    // opens the shortcuts help modal and closes the dropdown.
+    var shortcutsLink=document.getElementById("navShortcutsLink");
+    if(shortcutsLink){
+      shortcutsLink.addEventListener("click",function(){
+        try{
+          navMore.classList.remove("open");
+          navMoreToggle.setAttribute("aria-expanded","false");
+        }catch(err){}
+        var m=document.getElementById("shortcutsHelpModal");
+        if(m)m.classList.add("active");
+      });
+    }
     // Close on Escape
     document.addEventListener("keydown",function(e){
       if(e.key==="Escape"&&navMore.classList.contains("open")){
@@ -4879,6 +4958,60 @@ document.getElementById("mediaSaveBtn").addEventListener("click",async()=>{
 });
 
 /* --- Publish --- */
+// [NEW] askForDescription — promise-based modal that replaces the blocking
+// prompt() previously used to ask for a game description on publish.
+// Returns the trimmed description string, or null if the user cancels.
+let _descResolve=null;
+function askForDescription(defaultText){
+  const modal=document.getElementById("descModal");
+  const input=document.getElementById("descInput");
+  const counter=document.getElementById("descCounter");
+  const confirmBtn=document.getElementById("confirmDescBtn");
+  const closeBtn=document.getElementById("closeDescBtn");
+  if(!modal||!input)return Promise.resolve(prompt("Short description:",defaultText)||defaultText);
+  // Pre-fill with default
+  input.value=defaultText||"";
+  counter.textContent=input.value.length+" / 200";
+  modal.classList.add("active");
+  // Focus the input after a tick so the transition fires
+  setTimeout(()=>{input.focus();input.select();},50);
+  return new Promise(resolve=>{
+    // Cancel any previous resolver (shouldn't happen, but be safe)
+    if(_descResolve)_descResolve(null);
+    _descResolve=resolve;
+    function cleanup(){
+      modal.classList.remove("active");
+      input.removeEventListener("input",onInput);
+      input.removeEventListener("keydown",onKey);
+      confirmBtn.removeEventListener("click",onConfirm);
+      closeBtn.removeEventListener("click",onCancel);
+      _descResolve=null;
+    }
+    function onInput(){
+      counter.textContent=input.value.length+" / 200";
+      // Counter color cue
+      counter.style.color = input.value.length>180 ? "#e53935" : "";
+    }
+    function onKey(e){
+      if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();onConfirm();}
+      else if(e.key==="Escape"){e.preventDefault();onCancel();}
+    }
+    function onConfirm(){
+      const v=input.value.trim();
+      cleanup();
+      resolve(v||defaultText||"A community creation.");
+    }
+    function onCancel(){
+      cleanup();
+      resolve(null);
+    }
+    input.addEventListener("input",onInput);
+    input.addEventListener("keydown",onKey);
+    confirmBtn.addEventListener("click",onConfirm);
+    closeBtn.addEventListener("click",onCancel);
+  });
+}
+
 document.getElementById("publishBtn").addEventListener("click",async()=>{
   if(!currentUser){showToast("Log in to publish!");openAuthModal("signup");return;}
   // BAN / MUTE enforcement — banned users cannot publish.
@@ -4905,7 +5038,10 @@ document.getElementById("publishBtn").addEventListener("click",async()=>{
     const existing=findGame(editingId);
     desc=existing?existing.description:"A community creation.";
   }else{
-    desc=prompt("Short description:","A new GlimWorld creation!");
+    // [NEW] Use the description modal instead of blocking prompt().
+    // Returns null if the user cancels.
+    desc=await askForDescription("A new GlimWorld creation!");
+    if(desc===null){return;} // user cancelled — abort publish
   }
   const btn=document.getElementById("publishBtn");btn.disabled=true;btn.textContent=editingId?"Saving...":"Publishing...";
   // Include thumbnail + audio (if any) — stored as base64 data URLs.
@@ -5153,14 +5289,23 @@ function openPlayer(id){
   // The `plays` column may not exist on the games table yet (older deployments),
   // so we patch views + plays separately — if plays fails, views still succeeds
   // and the local cache always updates so the UI stays consistent.
+  // [BUGFIX] Use column-OK flags so we don't spam the console with 400 errors
+  // on every game-open once we've learned the column is missing.
   if(DB_READY){
     const nv=(g.views||0)+1;g.views=nv;
     const np=(g.plays||0)+1;g.plays=np;
-    // Views column always exists.
-    dbPatch("games",`id=eq.${g.id}`,{views:nv}).catch(()=>{});
+    // Views column always exists (probed). Skip silently if previously flagged.
+    if(_gamesViewsColumnOk){
+      dbPatch("games",`id=eq.${g.id}`,{views:nv}).catch(e=>{
+        if(e&&e.message&&e.message.includes("PGRST204"))_gamesViewsColumnOk=false;
+      });
+    }
     // Plays column may be missing — silent fail is OK, local cache has it.
-    // Using a separate call so a 400 on plays doesn't block the views update.
-    dbPatch("games",`id=eq.${g.id}`,{plays:np}).catch(()=>{});
+    if(_gamesPlaysColumnOk){
+      dbPatch("games",`id=eq.${g.id}`,{plays:np}).catch(e=>{
+        if(e&&e.message&&e.message.includes("PGRST204"))_gamesPlaysColumnOk=false;
+      });
+    }
   }else{
     // Local-only mode — still track in cache so featured/leaderboard reflect plays.
     g.plays=(g.plays||0)+1;
@@ -12000,20 +12145,42 @@ document.getElementById("socialGroupsBtn")?.addEventListener("click",()=>{
   (function wrapPublish(){
     const pb = document.getElementById('publishBtn');
     if(!pb) return;
-    // Use capture phase so we run BEFORE the publish logic, but defer the
-    // markPublished() call to after publish succeeds. Simplest approach: just
-    // listen on click and check after a delay whether the view switched to
-    // discovery (the publish handler does that on success).
+    // [BUGFIX] The old approach used a 1500ms setTimeout after the publish
+    // click to check if the view switched to discovery. That was fragile —
+    // if the user took >1.5s on the description prompt(), or the Supabase
+    // POST was slow, the timer fired before publish completed and the
+    // challenge was never marked as published.
+    //
+    // New approach: wrap window.switchView so we detect the moment the user
+    // actually lands on Discovery. Combined with a "just published?" flag
+    // set on publishBtn click, this is reliable regardless of timing.
+    let _justPublished = false;
     pb.addEventListener('click', () => {
-      setTimeout(() => {
-        const discView = document.getElementById('view-discovery');
-        if(discView && discView.classList.contains('active')){
-          // Publish succeeded (view switched to discovery).
-          markPublished();
-          render();
+      _justPublished = true;
+      // Clear the flag after 30s so a later manual Discovery visit doesn't
+      // falsely trigger markPublished (e.g. user published, went to Build,
+      // came back to Discovery via nav).
+      setTimeout(() => { _justPublished = false; }, 30000);
+    }, true); // capture — runs before the publish handler
+
+    // Wrap switchView to detect publish-completion.
+    if(typeof window.switchView === 'function' && !window.switchView._wcWrapped){
+      const origSwitch = window.switchView;
+      window.switchView = function(v){
+        const ret = origSwitch.apply(this, arguments);
+        if(v === 'discovery' && _justPublished){
+          _justPublished = false;
+          // Defer so the publish handler's post-switch code (renderLibrary etc.)
+          // has a chance to run first.
+          setTimeout(() => {
+            markPublished();
+            render();
+          }, 100);
         }
-      }, 1500);
-    }, true); // capture
+        return ret;
+      };
+      window.switchView._wcWrapped = true;
+    }
   })();
 
   // Also wrap saveDraft to mark the challenge drafted.
@@ -12243,6 +12410,38 @@ document.getElementById("socialGroupsBtn")?.addEventListener("click",()=>{
     }
   });
   console.log('[GlimWorld] Vim-style navigation (g h/d/b/s) enabled');
+})();
+
+/* ============================================================
+   [NEW FEATURE] LIBRARY VIEW TOGGLE (GRID / LIST)
+   - Persists preference in localStorage (gw_library_view)
+   - Adds .list-view class to #libraryGrid for list layout
+   - Updates aria-pressed on the toggle buttons
+   ============================================================ */
+(function(){
+  const grid=document.getElementById("libraryGrid");
+  const gridBtn=document.getElementById("viewToggleGrid");
+  const listBtn=document.getElementById("viewToggleList");
+  if(!grid||!gridBtn||!listBtn) return;
+
+  function getView(){
+    try { return localStorage.getItem("gw_library_view") || "grid"; } catch(e){ return "grid"; }
+  }
+  function setView(v){
+    try { localStorage.setItem("gw_library_view", v); } catch(e){}
+    grid.classList.toggle("list-view", v === "list");
+    gridBtn.classList.toggle("active", v === "grid");
+    listBtn.classList.toggle("active", v === "list");
+    gridBtn.setAttribute("aria-pressed", v === "grid" ? "true" : "false");
+    listBtn.setAttribute("aria-pressed", v === "list" ? "true" : "false");
+  }
+
+  gridBtn.addEventListener("click", () => setView("grid"));
+  listBtn.addEventListener("click", () => setView("list"));
+
+  // Apply saved preference on load
+  setView(getView());
+  console.log('[GlimWorld] Library view toggle initialized. Current:', getView());
 })();
 
 </script>
