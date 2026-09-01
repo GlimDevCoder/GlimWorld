@@ -16,7 +16,7 @@ We believe in democratizing game creation and making it accessible to everyone, 
 
 ### Play GlimWorld
 Ready to dive in? Visit our live platform:
-🎮 **[Play GlimWorld](https://glim-world--leonelomovie.replit.app/)**
+🎮 **[Play GlimWorld](https://playglimworld.com)**
 
 ### Contributing
 Want to contribute to the project? Check out our:
@@ -60,7 +60,7 @@ This project is licensed under the **Apache License 2.0** - see the [LICENSE](LI
 ## 📞 Support
 
 If you have questions or need help:
-1. Check our [Documentation](https://glim-world--leonelomovie.replit.app/)
+1. Check our [Documentation](https://playglimworld.com)
 2. Visit our [Discord Community](https://discord.gg/QgVtwZdfH)
 3. Review our [Contributing Guide](CONTRIBUTING.md)
 
@@ -70,4 +70,4 @@ Thanks to all our contributors and community members who help make GlimWorld ama
 
 ---
 
-*Last Updated: August 30, 2026*
+*Last Updated: September 2, 2026*
